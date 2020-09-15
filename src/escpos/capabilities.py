@@ -4,10 +4,10 @@ import pkg_resources
 import pickle
 import logging
 import time
-
+import os
+import json
 import six
 import yaml
-
 from tempfile import gettempdir
 import platform
 
@@ -44,8 +44,6 @@ if full_load:
 
 logger.debug('Finished loading capabilities took %.2fs', time.time() - t0)
 
-import os
-import json
 if os.name == 'nt':
     file_ = os.path.join(os.path.normpath(os.path.dirname(__file__)), 'capabilities_win.json')
     with open(file_) as f:
