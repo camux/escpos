@@ -35,6 +35,6 @@ setup(
     platforms="any",
     package_dir={"": "src"},
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
-    package_data={"escpos": ["capabilities.json"]},
+    package_data={"escpos": ["capabilities.json", "capabilities_win.json"]},
     entry_points={"console_scripts": ["python-escpos = escpos.cli:main"]},
 )
