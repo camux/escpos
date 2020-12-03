@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: python-escpos
-Version: 3.0a9.dev6+g2410522
+Version: 1.0.9
 Summary: Python library to manipulate ESC/POS Printers
 Home-page: https://github.com/python-escpos/python-escpos
 Author: Manuel F Martinez and others

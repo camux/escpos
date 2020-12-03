@@ -28,10 +28,7 @@ version = '{version}'
 
 
 setup(
-    use_scm_version={
-        "write_to": "src/escpos/version.py",
-        "write_to_template": setuptools_scm_template,
-    },
+    version='1.0.9',
     platforms="any",
     package_dir={"": "src"},
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
