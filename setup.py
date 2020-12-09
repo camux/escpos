@@ -18,10 +18,28 @@ def read(fname):
 
 
 setup(
-    version='1.0.9',
+    name='escpos',
+    version='1.7',
     platforms="any",
+    author='Oscar Alvarez',
+    author_email='oscar.alvarez.montero@gmail.com',
+    url="http://www.bitbucket.org/presik/psk-escpos/",
+    description="Python library to manipulate ESC/POS Printers",
+    download_url="http://www.bitbucket.org/presik/psk-escpos/",
     package_dir={"": "src"},
     packages=find_packages(where="src", exclude=["tests", "tests.*"]),
     package_data={"escpos": ["capabilities.json", "capabilities_win.json"]},
     entry_points={"console_scripts": ["python-escpos = escpos.cli:main"]},
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Printing',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
+    license='LGPL',
 )

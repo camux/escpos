@@ -350,7 +350,7 @@ try:
 
     _WIN32PRINT = True
 except ImportError:
-    pass
+    print('Warning: missing lib... win32print')
 
 if _WIN32PRINT:
     class Win32Raw(Escpos):
