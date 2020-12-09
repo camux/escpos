@@ -19,7 +19,7 @@ def read(fname):
 
 setup(
     name='escpos',
-    version='1.7',
+    version='1.8',
     platforms="any",
     author='Oscar Alvarez',
     author_email='oscar.alvarez.montero@gmail.com',
