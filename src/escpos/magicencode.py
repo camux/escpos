@@ -1,23 +1,11 @@
 #!/usr/bin/python
 #  -*- coding: utf-8 -*-
-""" Magic Encode
 
-This module tries to convert an UTF-8 string to an encoded string for the printer.
-It uses trial and error in order to guess the right codepage.
-The code is based on the encoding-code in py-xml-escpos by @fvdsn.
-
-:author: `Patrick Kanzler <dev@pkanzler.de>`_
-:organization: `python-escpos <https://github.com/python-escpos>`_
-:copyright: Copyright (c) 2016 Patrick Kanzler and Frédéric van der Essen
-:license: MIT
-"""
-
-
+import six
 from builtins import bytes
 from .constants import CODEPAGE_CHANGE
+from .codepages import code_pages, CODEPAGE
 from .exceptions import Error
-from .codepages import CodePages
-import six
 
 
 class Encoder(object):
@@ -46,21 +34,6 @@ class Encoder(object):
     def get_sequence(self, encoding):
         return int(self.codepages[encoding])
 
-    def get_encoding_name(self, encoding):
-        """Given an encoding provided by the user, will return a
-        canonical encoding name; and also validate that the encoding
-        is supported.
-
-        TODO: Support encoding aliases: pc437 instead of cp437.
-        """
-        encoding = CodePages.get_encoding_name(encoding)
-        if encoding not in self.codepages:
-            raise ValueError((
-                'Encoding "{}" cannot be used for the current profile. '
-                'Valid encodings are: {}'
-                ).format(encoding, ','.join(self.codepages.keys())))
-        return encoding
-
     @staticmethod
     def _get_codepage_char_list(encoding):
         """Get codepage character list
@@ -69,17 +42,16 @@ class Encoder(object):
 
         :param encoding: The name of the encoding. This must appear in the CodePage list
         """
-        codepage = CodePages.get_encoding(encoding)
-        if 'data' in codepage:
-            encodable_chars = list("".join(codepage['data']))
+        if 'data' in CODEPAGE:
+            encodable_chars = list("".join(CODEPAGE['data']))
             assert(len(encodable_chars) == 128)
             return encodable_chars
-        elif 'python_encode' in codepage:
+        elif 'python_encode' in CODEPAGE:
             encodable_chars = [u" "] * 128
             for i in range(0, 128):
                 codepoint = i + 128
                 try:
-                    encodable_chars[i] = bytes([codepoint]).decode(codepage['python_encode'])
+                    encodable_chars[i] = bytes([codepoint]).decode(CODEPAGE['python_encode'])
                 except UnicodeDecodeError:
                     # Non-encodable character, just skip it
                     pass
@@ -99,8 +71,11 @@ class Encoder(object):
         # Skip things that were loaded previously
         if encoding in self.available_characters:
             return self.available_characters[encoding]
+
         codepage_char_list = self._get_codepage_char_list(encoding)
-        codepage_char_map = dict((utf8, i + 128) for (i, utf8) in enumerate(codepage_char_list))
+        codepage_char_map = dict(
+            (utf8, i + 128) for (i, utf8) in enumerate(codepage_char_list)
+        )
         self.available_characters[encoding] = codepage_char_map
         return codepage_char_map
 
@@ -222,9 +197,10 @@ class MagicEncode(object):
             raise Error('If you disable magic encode, you need to define an encoding!')
 
         self.driver = driver
-        self.encoder = encoder or Encoder(driver.profile.get_code_pages())
+        self.encoder = encoder or Encoder(code_pages)
 
-        self.encoding = self.encoder.get_encoding_name(encoding) if encoding else None
+        # self.encoding = self.encoder.get_encoding_name(encoding) if encoding else None
+        self.encoding = None
         self.defaultsymbol = defaultsymbol
         self.disabled = disabled
 

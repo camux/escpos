@@ -2,9 +2,11 @@ from __future__ import print_function
 import datetime
 import warnings
 import re
+import time
+import os
 
 from .config import Configuration
-from .utils import trace, string_types, utc
+from .utils import trace, string_types
 
 from pkg_resources import iter_entry_points
 
@@ -136,7 +138,9 @@ class ScmVersion(object):
             distance = 0
         self.distance = distance
         self.node = node
-        self.time = datetime.datetime.now(utc)
+        self.time = datetime.datetime.utcfromtimestamp(
+            int(os.environ.get("SOURCE_DATE_EPOCH", time.time()))
+        )
         self._extra = kw
         self.dirty = dirty
         self.preformatted = preformatted
@@ -205,7 +209,7 @@ def meta(
         )
     parsed_version = _parse_tag(tag, preformatted, config)
     trace("version", tag, "->", parsed_version)
-    assert parsed_version is not None, "cant parse version %s" % tag
+    assert parsed_version is not None, "Can't parse version %s" % tag
     return ScmVersion(
         parsed_version, distance, node, dirty, preformatted, branch, config, **kw
     )
@@ -226,13 +230,26 @@ def _bump_dev(version):
         return
 
     prefix, tail = version.rsplit(".dev", 1)
-    assert tail == "0", "own dev numbers are unsupported"
+    if tail != "0":
+        raise ValueError(
+            "choosing custom numbers for the `.devX` distance "
+            "is not supported.\n "
+            "The {version} can't be bumped\n"
+            "Please drop the tag or create a new supported one".format(version=version)
+        )
     return prefix
 
 
 def _bump_regex(version):
-    prefix, tail = re.match(r"(.*?)(\d+)$", version).groups()
-    return "%s%d" % (prefix, int(tail) + 1)
+    match = re.match(r"(.*?)(\d+)$", version)
+    if match is None:
+        raise ValueError(
+            "{version} does not end with a number to bump, "
+            "please correct or use a custom version scheme".format(version=version)
+        )
+    else:
+        prefix, tail = match.groups()
+        return "%s%d" % (prefix, int(tail) + 1)
 
 
 def guess_next_dev_version(version):
@@ -243,7 +260,12 @@ def guess_next_dev_version(version):
 
 
 def guess_next_simple_semver(version, retain, increment=True):
-    parts = [int(i) for i in str(version).split(".")[:retain]]
+    try:
+        parts = [int(i) for i in str(version).split(".")[:retain]]
+    except ValueError:
+        raise ValueError(
+            "{version} can't be parsed as numeric version".format(version=version)
+        )
     while len(parts) < retain:
         parts.append(0)
     if increment:
@@ -294,6 +316,13 @@ def release_branch_semver(version):
         stacklevel=2,
     )
     return release_branch_semver_version(version)
+
+
+def no_guess_dev_version(version):
+    if version.exact:
+        return version.format_with("{tag}")
+    else:
+        return version.format_with("{tag}.post1.dev{distance}")
 
 
 def _format_local_with_time(version, time_format):

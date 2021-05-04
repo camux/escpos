@@ -1,26 +1,14 @@
 #!/usr/bin/python
 #  -*- coding: utf-8 -*-
-""" Main class
 
-This module contains the abstract base class :py:class:`Escpos`.
-
-:author: `Manuel F Martinez <manpaz@bashlinux.com>`_ and others
-:organization: Bashlinux and `python-escpos <https://github.com/python-escpos>`_
-:copyright: Copyright (c) 2012-2017 Bashlinux and python-escpos
-:license: MIT
-"""
-
-
+import os
+import time
 import qrcode
 import textwrap
 import six
-import time
-from re import match as re_match
-
 import barcode
 from barcode.writer import ImageWriter
-
-import os
+from re import match as re_match
 
 from .constants import ESC, GS, NUL, QR_ECLEVEL_L, QR_ECLEVEL_M, QR_ECLEVEL_H, QR_ECLEVEL_Q
 from .constants import QR_MODEL_1, QR_MODEL_2, QR_MICRO, BARCODE_TYPES, BARCODE_HEIGHT, BARCODE_WIDTH
@@ -36,16 +24,19 @@ from .constants import CTL_VT, CTL_CR, CTL_FF, CTL_LF, CTL_SET_HT, PANEL_BUTTON_
 from .constants import TXT_STYLE
 from .constants import RT_STATUS_ONLINE, RT_MASK_ONLINE
 from .constants import RT_STATUS_PAPER, RT_MASK_PAPER, RT_MASK_LOWPAPER, RT_MASK_NOPAPER
+from .constants import BEEP
 
+from abc import ABCMeta, abstractmethod  # abstract base class support
 from .exceptions import BarcodeTypeError, BarcodeSizeError, TabPosError
 from .exceptions import CashDrawerError, SetVariableError, BarcodeCodeError
 from .exceptions import ImageWidthError
+from escpos.image import EscposImage
 
 from .magicencode import MagicEncode
-
-from abc import ABCMeta, abstractmethod  # abstract base class support
-from escpos.image import EscposImage
 from escpos.capabilities import get_profile, BARCODE_B
+
+print('get_profile----', get_profile)
+print('BARCODE_B -----', BARCODE_B)
 
 
 @six.add_metaclass(ABCMeta)
@@ -686,6 +677,18 @@ class Escpos(object):
                 self._raw(PAPER_FULL_CUT)
             elif self.profile.supports('paperPartCut'):
                 self._raw(PAPER_PART_CUT)
+
+    def beep(self):
+        """ Send a beep sound
+
+        Kick cash drawer on pin 2 or pin 5 according to default parameter.
+        For non default parameter send a decimal sequence i.e. [27,112,48] or [27,112,0,25,255]
+
+        :param pin: pin number, 2 or 5 or list of decimals
+        :raises: :py:exc:`~escpos.exceptions.CashDrawerError`
+        """
+        self._raw(BEEP)
+
 
     def cashdraw(self, pin):
         """ Send pulse to kick the cash drawer

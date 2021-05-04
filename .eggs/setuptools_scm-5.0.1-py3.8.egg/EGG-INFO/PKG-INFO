@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: setuptools-scm
-Version: 4.1.2
+Version: 5.0.1
 Summary: the blessed package to manage your versions by scm tags
 Home-page: https://github.com/pypa/setuptools_scm/
 Author: Ronny Pfannschmidt
@@ -22,12 +22,13 @@ Classifier: Topic :: Software Development :: Version Control
 Classifier: Topic :: System :: Software Distribution
 Classifier: Topic :: Utilities
 Requires-Python: !=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7
+Description-Content-Type: text/x-rst
 Requires-Dist: setuptools
 Provides-Extra: toml
 Requires-Dist: toml ; extra == 'toml'
 
 setuptools_scm
-===============
+==============
 
 ``setuptools_scm`` handles managing your Python package versions
 in SCM metadata instead of declaring them as the version argument
@@ -37,8 +38,15 @@ Additionally ``setuptools_scm`` provides setuptools with a list of files that ar
 (i.e. it automatically adds all of the SCM-managed files to the sdist).
 Unwanted files must be excluded by discarding them via ``MANIFEST.in``.
 
-.. image:: https://travis-ci.org/pypa/setuptools_scm.svg?branch=master
-    :target: https://travis-ci.org/pypa/setuptools_scm
+``setuptools_scm`` support the following scm out of the box:
+
+* git
+* mercurial
+
+
+
+.. image:: https://github.com/pypa/setuptools_scm/workflows/python%20tests+artifacts+release/badge.svg
+    :target: https://github.com/pypa/setuptools_scm/actions
 
 .. image:: https://tidelift.com/badges/package/pypi/setuptools-scm
    :target: https://tidelift.com/subscription/pkg/pypi-setuptools-scm?utm_source=pypi-setuptools-scm&utm_medium=readme
@@ -215,7 +223,7 @@ Retrieving package version at runtime
 
 If you have opted not to hardcode the version number inside the package,
 you can retrieve it at runtime from PEP-0566_ metadata using
-``importlib.metadata`` from the standard library
+``importlib.metadata`` from the standard library (added in Python 3.8)
 or the `importlib_metadata`_ backport:
 
 .. code:: python
@@ -223,10 +231,10 @@ or the `importlib_metadata`_ backport:
     from importlib.metadata import version, PackageNotFoundError
 
     try:
-        __version__ = version(__name__)
+        __version__ = version("package-name")
     except PackageNotFoundError:
         # package is not installed
-       pass
+        pass
 
 Alternatively, you can use ``pkg_resources`` which is included in
 ``setuptools``:
@@ -236,7 +244,7 @@ Alternatively, you can use ``pkg_resources`` which is included in
    from pkg_resources import get_distribution, DistributionNotFound
 
    try:
-       __version__ = get_distribution(__name__).version
+       __version__ = get_distribution("package-name").version
    except DistributionNotFound:
         # package is not installed
        pass
@@ -266,7 +274,7 @@ the working directory for good reasons and using the installed metadata
 prevents using needless volatile data there.
 
 Notable Plugins
-----------------
+---------------
 
 `setuptools_scm_git_archive <https://pypi.python.org/pypi/setuptools_scm_git_archive>`_
     Provides partial support for obtaining versions from git archives that
@@ -276,7 +284,7 @@ Notable Plugins
 
 
 Default versioning scheme
---------------------------
+-------------------------
 
 In the standard configuration ``setuptools_scm`` takes a look at three things:
 
@@ -298,6 +306,7 @@ distance and not clean:
 The next version is calculated by adding ``1`` to the last numeric component of
 the tag.
 
+
 For Git projects, the version relies on `git describe <https://git-scm.com/docs/git-describe>`_,
 so you will see an additional ``g`` prepended to the ``{revision hash}``.
 
@@ -318,7 +327,7 @@ accordingly.
 
 
 Builtin mechanisms for obtaining version numbers
---------------------------------------------------
+------------------------------------------------
 
 1. the SCM itself (git/hg)
 2. ``.hg_archival`` files (mercurial archives)
@@ -463,10 +472,30 @@ Environment variables
     its used as the primary source for the version number
     in which case it will be a unparsed string
 
+
+:SETUPTOOLS_SCM_PRETEND_VERSION_FOR_${UPPERCASED_DIST_NAME}:
+    when defined and not empty,
+    its used as the primary source for the version number
+    in which case it will be a unparsed string
+
+    it takes precedence over ``SETUPTOOLS_SCM_PRETEND_VERSION``
+
+
 :SETUPTOOLS_SCM_DEBUG:
     when defined and not empty,
     a lot of debug information will be printed as part of ``setuptools_scm``
     operating
+
+:SOURCE_DATE_EPOCH:
+    when defined, used as the timestamp from which the
+    ``node-and-date`` and ``node-and-timestamp`` local parts are
+    derived, otherwise the current time is used
+    (https://reproducible-builds.org/docs/source-date-epoch/)
+
+
+:SETUPTOOLS_SCM_IGNORE_VCS_ROOTS:
+    when defined, a ``os.pathsep`` separated list
+    of directory names to ignore for root finding
 
 Extending setuptools_scm
 ------------------------
@@ -508,6 +537,8 @@ Version number construction
     :guess-next-dev: Automatically guesses the next development version (default).
         Guesses the upcoming release by incrementing the pre-release segment if present,
         otherwise by incrementing the micro segment. Then appends :code:`.devN`.
+        In case the tag ends with ``.dev0`` the version is not bumped
+        and custom ``.devN`` versions will trigger a error.
     :post-release: generates post release versions (adds :code:`.postN`)
     :python-simplified-semver: Basic semantic versioning. Guesses the upcoming release
         by incrementing the minor segment and setting the micro segment to zero if the
@@ -519,6 +550,7 @@ Version number construction
         that matches the most recent tag up to the minor segment. Otherwise if on a
         non-release branch, increments the minor segment and sets the micro segment to
         zero, then appends :code:`.devN`.
+    :no-guess-dev: Does no next version guessing, just adds :code:`.post1.devN`
 
 ``setuptools_scm.local_scheme``
     Configures how the local part of a version is rendered given a
@@ -568,7 +600,7 @@ The callable must return the configuration.
 
 
 Note on testing non-installed versions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While the general advice is to test against a installed version,
 some environments require a test prior to install,
@@ -605,9 +637,9 @@ Code of Conduct
 
 Everyone interacting in the ``setuptools_scm`` project's codebases, issue
 trackers, chat rooms, and mailing lists is expected to follow the
-`PyPA Code of Conduct`_.
+`PSF Code of Conduct`_.
 
-.. _PyPA Code of Conduct: https://www.pypa.io/en/latest/code-of-conduct/
+.. _PSF Code of Conduct: https://github.com/pypa/.github/blob/main/CODE_OF_CONDUCT.md
 
 Security Contact
 ================

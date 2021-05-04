@@ -11,7 +11,6 @@ import os
 import io
 import platform
 import traceback
-import datetime
 
 
 DEBUG = bool(os.environ.get("SETUPTOOLS_SCM_DEBUG"))
@@ -121,22 +120,6 @@ def data_from_mime(path):
     return data
 
 
-class UTC(datetime.tzinfo):
-    _ZERO = datetime.timedelta(0)
-
-    def utcoffset(self, dt):
-        return self._ZERO
-
-    def tzname(self, dt):
-        return "UTC"
-
-    def dst(self, dt):
-        return self._ZERO
-
-
-utc = UTC()
-
-
 def function_has_arg(fn, argname):
     assert inspect.isfunction(fn)
 
@@ -149,7 +132,7 @@ def function_has_arg(fn, argname):
     return argname in argspec
 
 
-def has_command(name):
+def has_command(name, warn=True):
     try:
         p = _popen_pipes([name, "help"], ".")
     except OSError:
@@ -158,6 +141,11 @@ def has_command(name):
     else:
         p.communicate()
         res = not p.returncode
-    if not res:
-        warnings.warn("%r was not found" % name)
+    if not res and warn:
+        warnings.warn("%r was not found" % name, category=RuntimeWarning)
     return res
+
+
+def require_command(name):
+    if not has_command(name, warn=False):
+        raise EnvironmentError("%r was not found" % name)

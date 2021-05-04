@@ -2,13 +2,12 @@
 #  -*- coding: utf-8 -*-
 """ This module contains the implementations of abstract base class :py:class:`Escpos`.
 
-:author: `Manuel F Martinez <manpaz@bashlinux.com>`_ and others
-:organization: Bashlinux and `python-escpos <https://github.com/python-escpos>`_
-:copyright: Copyright (c) 2012-2017 Bashlinux and python-escpos
+:author: `Oscar Alvarez <oscar.alvarez.montero@gmail.com>`_ and others
+:copyright: Copyright (c) 2021 Bashlinux and python-escpos
 :license: MIT
 """
 
-
+import os
 import serial
 import socket
 import usb.core
@@ -345,12 +344,12 @@ class Dummy(Escpos):
 
 
 _WIN32PRINT = False
-try:
-    import win32print
-
-    _WIN32PRINT = True
-except ImportError:
-    print('Warning: missing lib... win32print')
+if os.name == 'nt':
+    try:
+        import win32print
+        _WIN32PRINT = True
+    except ImportError:
+        print('Warning: missing lib... win32print')
 
 if _WIN32PRINT:
     class Win32Raw(Escpos):
