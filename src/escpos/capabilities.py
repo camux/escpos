@@ -2,7 +2,6 @@ import re
 from os import environ, path
 import pkg_resources
 import pickle
-import logging
 import time
 import os
 import json
@@ -10,9 +9,6 @@ import six
 import yaml
 from tempfile import gettempdir
 import platform
-
-logging.basicConfig()
-logger = logging.getLogger(__name__)
 
 pickle_dir = environ.get('ESCPOS_CAPABILITIES_PICKLE_DIR', gettempdir())
 pickle_path = path.join(pickle_dir, '{v}.capabilities.pickle'.format(v=platform.python_version()))
@@ -22,27 +18,21 @@ capabilities_path = environ.get('ESCPOS_CAPABILITIES_FILE',
 
 # Load external printer database
 t0 = time.time()
-logger.debug('Using capabilities from file: %s', capabilities_path)
 if path.exists(pickle_path):
     if path.getmtime(capabilities_path) > path.getmtime(pickle_path):
-        logger.debug('Found a more recent capabilities file')
         full_load = True
     else:
         full_load = False
-        logger.debug('Loading capabilities from pickle in %s', pickle_path)
         with open(pickle_path, 'rb') as cf:
             CAPABILITIES = pickle.load(cf)
 else:
-    logger.debug('Capabilities pickle file not found: %s', pickle_path)
     full_load = True
 
 if full_load:
-    logger.debug('Loading and pickling capabilities')
     with open(capabilities_path) as cp, open(pickle_path, 'wb') as pp:
         CAPABILITIES = yaml.safe_load(cp)
         pickle.dump(CAPABILITIES, pp, protocol=2)
 
-logger.debug('Finished loading capabilities took %.2fs', time.time() - t0)
 
 if os.name == 'nt':
     file_ = os.path.join(os.path.normpath(os.path.dirname(__file__)), 'capabilities_win.json')

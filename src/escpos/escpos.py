@@ -35,16 +35,13 @@ from escpos.image import EscposImage
 from .magicencode import MagicEncode
 from escpos.capabilities import get_profile, BARCODE_B
 
-print('get_profile----', get_profile)
-print('BARCODE_B -----', BARCODE_B)
-
 
 @six.add_metaclass(ABCMeta)
 class Escpos(object):
     """ ESC/POS Printer object
 
-    This class is the abstract base class for an esc/pos-printer. The printer implementations are children of this
-    class.
+    This class is the abstract base class for an esc/pos-printer.
+    The printer implementations are children of this class.
     """
     device = None
 
