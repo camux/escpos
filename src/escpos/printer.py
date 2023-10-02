@@ -183,8 +183,8 @@ class Serial(Escpos):
 class Network(Escpos):
     """ Network printer
 
-    This class is used to attach to a networked printer. You can also use this in order to attach to a printer that
-    is forwarded with ``socat``.
+    This class is used to attach to a networked printer. You can also use this
+    in order to attach to a printer that is forwarded with ``socat``.
 
     If you have a local printer on parallel port ``/dev/usb/lp0`` then you could start ``socat`` with:
 

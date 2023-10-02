@@ -1,5 +1,5 @@
 #############################################################
-python-escpos - Python library to manipulate ESC/POS Printers
+psk-escpos - Python library to manipulate ESC/POS Printers
 #############################################################
 
 .. image:: https://travis-ci.org/python-escpos/python-escpos.svg?branch=master
@@ -93,7 +93,6 @@ Another example based on the Serial printer class:
     p.cut()
 
 
-The full project-documentation is available on `Read the Docs <https://python-escpos.readthedocs.io>`_.
 
 Contributing
 ------------

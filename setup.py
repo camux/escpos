@@ -19,7 +19,7 @@ def read(fname):
 
 setup(
     name='escpos',
-    version='1.9',
+    version='2.0.0',
     platforms="any",
     author='Oscar Alvarez',
     author_email='oscar.alvarez.montero@gmail.com',
@@ -36,7 +36,8 @@ setup(
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Printing',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',

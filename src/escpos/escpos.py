@@ -54,7 +54,10 @@ class Escpos(object):
 
     def __del__(self):
         """ call self.close upon deletion """
-        self.close()
+        try:
+            self.close()
+        except:
+            pass
 
     @abstractmethod
     def _raw(self, msg):
