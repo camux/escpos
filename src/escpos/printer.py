@@ -214,7 +214,7 @@ class Network(Escpos):
         self.host = host
         self.port = port
         self.timeout = timeout
-        # self.open()
+        self.open()
 
     def open(self):
         """ Open TCP socket with ``socket``-library and set it as escpos device """
@@ -360,6 +360,7 @@ if _WIN32PRINT:
             else:
                 self.printer_name = win32print.GetDefaultPrinter()
             self.hPrinter = None
+            self.open()
 
         def open(self, job_name="python-escpos"):
             if self.printer_name is None:
