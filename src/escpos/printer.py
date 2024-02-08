@@ -214,7 +214,7 @@ class Network(Escpos):
         self.host = host
         self.port = port
         self.timeout = timeout
-        self.open()
+        # self.open()
 
     def open(self):
         """ Open TCP socket with ``socket``-library and set it as escpos device """
