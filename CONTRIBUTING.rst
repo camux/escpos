@@ -66,4 +66,22 @@ For further best practices and hints on contributing please see the
 and the linked one, please stick to this text.
 Aside from that feel free to create an issue or write an email if anything is unclear.
 
+
+Uploading PIP
+^^^^^^^^^^^^^
+
+Remove this directories /build / dist /eggs
+
+Enter to directory
+
+python setup.py install
+
+run in console:
+
+twine upload dist/*
+
+
+user: oscar_alv
+
+
 Thank you for your contribution!
